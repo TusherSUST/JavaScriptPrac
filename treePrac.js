@@ -1,4 +1,7 @@
+(function(){
 //------------------Red Black Tree-------------------
+
+//Constructor For a Node in Red Black Tree
 function RedBlackTree(nodeValue,nodeColor,par,leftChild,rightChild){
   this.nodeValue = nodeValue;
   this.nodeColor = nodeColor;
@@ -7,19 +10,18 @@ function RedBlackTree(nodeValue,nodeColor,par,leftChild,rightChild){
   this.rightChild = rightChild;
 };
 
+//Tracks the root of the tree
 var treeRoot;
-var debugDiv;
 
 //----------------Simple Functions-------------------
-RedBlackTree.prototype.getParent = function( ){
-  return this.par;
-};
 
+//Returns the Grand Parent of a node
 RedBlackTree.prototype.getGrandParent = function( ){
-  if ( this.par != undefined ) return this.par.getParent(  );
+  if ( this.par != undefined ) return this.par.par;
   return undefined;
 };
 
+//Returns the Uncle (Sibling of Parent) of a node
 RedBlackTree.prototype.getUncle = function( ){
   var grandParent = this.getGrandParent();
   if ( grandParent == undefined ) return undefined;
@@ -27,13 +29,11 @@ RedBlackTree.prototype.getUncle = function( ){
   else return grandParent.leftChild;
 };
 
-RedBlackTree.prototype.getSibling = function( ){
-  if ( this == this.par.leftChild ) return this.par.rightChild;
-  return this.par.leftChild;
-};
-
+//Rotates a node left
+//From ( A , B , (C , D , E) )
+//TO ( ( A , B , C ) , D , E )
+//Called Using Node 'D'
 RedBlackTree.prototype.rotateLeft = function (){
-//  console.log("Rotating Left");
   var curNode = this;
   var curPar = this.par;
   var grandParent = curPar.par;
@@ -50,8 +50,11 @@ RedBlackTree.prototype.rotateLeft = function (){
   curPar.par = curNode;
 };
 
+//Rotates a node right
+//From ( ( A , B , C ) , D , E )
+//TO ( A , B , (C , D , E) )
+//Called Using Node 'D'
 RedBlackTree.prototype.rotateRight = function (){
-  //console.log("Rotating Right");
   var curNode = this;
   var curPar = this.par;
   var grandParent = curPar.par;
@@ -69,8 +72,9 @@ RedBlackTree.prototype.rotateRight = function (){
 };
 
 //-------------------Insertion Functions--------------------
+
+//Insertion Case One - Root Node
 RedBlackTree.prototype.insertCaseOne = function (){
-  console.log("Case 1");
   if ( this.par == undefined ) {
     treeRoot = this;
     this.nodeColor = "black";
@@ -78,21 +82,20 @@ RedBlackTree.prototype.insertCaseOne = function (){
   else this.insertCaseTwo();
 };
 
+//Insertion Case Two - Current Node's Parent is BLACK
 RedBlackTree.prototype.insertCaseTwo = function (){
-  console.log("Case 2");
   if ( this.par.nodeColor == "black" ) {
     return ;
   }
   else this.insertCaseThree();
 };
 
+//Insertion Case Three - Current Node's Parent and Uncle are both RED
 RedBlackTree.prototype.insertCaseThree = function (){
-  console.log("Case 3");
   var uncle = this.getUncle();
   var grandParent = this.getGrandParent();
 
   if ( uncle != undefined && uncle.nodeColor == "red"){
-    console.log("IN");
     this.par.nodeColor = "black";
     uncle.nodeColor = "black";
     grandParent.nodeColor = "red";
@@ -101,9 +104,10 @@ RedBlackTree.prototype.insertCaseThree = function (){
   else this.insertCaseFour();
 };
 
+//Insertion Case Four - Node is added to right of left child of grandparent,
+//                      or Node is added to left of right child of grandparent
+//                      (Parent is red and Uncle is black)
 RedBlackTree.prototype.insertCaseFour = function(){
-  console.log("Case 4");
-
   var grandParent = this.getGrandParent();
   var nxtCall = this;
   if ( this == this.par.rightChild && this.par == grandParent.leftChild){
@@ -117,8 +121,10 @@ RedBlackTree.prototype.insertCaseFour = function(){
   nxtCall.insertCaseFive();
 };
 
+//Insertion Case Five - Node is added to left of left child of grandparent,
+//                      or Node is added to right of right child of grandparent
+//                      (Parent is red and Uncle is black)
 RedBlackTree.prototype.insertCaseFive = function(){
-  console.log("Case 5");
   var grandParent = this.getGrandParent();
   this.par.nodeColor = "black";
   grandParent.nodeColor = "red";
@@ -126,6 +132,7 @@ RedBlackTree.prototype.insertCaseFive = function(){
   else this.par.rotateLeft();
 };
 
+//Traverses the already built tree to find a place for the new Node
 RedBlackTree.prototype.insertANode = function ( curNode ){
   if ( curNode == undefined || curNode.nodeValue == -1 ) {
     this.insertCaseOne();
@@ -149,33 +156,49 @@ RedBlackTree.prototype.insertANode = function ( curNode ){
 }
 
 //-------------------Displayer Functions--------------
+
+//Displayer Constructor
 function Displayer(myCanvas,boxHeight,boxWidth){
   this.myCanvas = myCanvas;
+
   this.canvasHeight = myCanvas.height;
   this.canvasWidth = myCanvas.width;
+
   this.boxHeight = boxHeight;
   this.boxWidth = boxWidth;
+
   this.halfBoxHeight = parseInt(boxHeight/2);
   this.halfBoxWidth = parseInt(boxWidth/2);
 };
 
-Displayer.prototype.drawTree = function( curNode , curX , curY , treeLvl){
-  //console.log(this);
+//Draws A Node
+Displayer.prototype.drawNode = function(curNode,curX,curY){
   var context = this.myCanvas.getContext("2d");
   context.fillStyle = (curNode.nodeColor == "red")?"#FF0000":"#000000";
   context.fillRect(curX,curY,this.boxHeight,this.boxWidth);
   context.fillStyle = "#001AFF";
   context.font = "20px Arial";
   context.fillText(curNode.nodeValue.toString(),curX+this.halfBoxHeight-5,curY+this.halfBoxWidth+5);
+};
+
+//Draws A line from (curX,curY) to (nxtX,nxtY)
+Displayer.prototype.drawLine = function(curX,curY,nxtX,nxtY){
+  var context = this.myCanvas.getContext("2d");
+  context.beginPath();
+  context.moveTo(curX,curY);
+  context.lineTo(nxtX,nxtY);
+  context.stroke();
+}
+
+//Traverses the tree
+Displayer.prototype.drawTree = function( curNode , curX , curY , treeLvl){
+  this.drawNode(curNode,curX,curY);
 
   if ( curNode.leftChild != undefined ){
     var nxtX = parseInt(curX-this.boxWidth*treeLvl);
     var nxtY = parseInt(curY+this.boxHeight*treeLvl);
 
-    context.beginPath();
-    context.moveTo(curX,curY+ this.boxHeight);
-    context.lineTo(nxtX+this.boxWidth,nxtY);
-    context.stroke();
+    this.drawLine(curX,curY+this.boxHeight,nxtX+this.boxWidth,nxtY);
 
     this.drawTree( curNode.leftChild,nxtX,nxtY,treeLvl-1);
   }
@@ -183,72 +206,37 @@ Displayer.prototype.drawTree = function( curNode , curX , curY , treeLvl){
     var nxtX = parseInt( curX + this.boxWidth*treeLvl);
     var nxtY = parseInt( curY + this.boxHeight*treeLvl);
 
-    context.beginPath();
-    context.moveTo(curX+this.boxWidth,curY+ this.boxHeight);
-    context.lineTo(nxtX,nxtY);
-    context.stroke();
+    this.drawLine( curX+this.boxWidth,curY+this.boxHeight,nxtX,nxtY);
 
     this.drawTree(curNode.rightChild,nxtX,nxtY,treeLvl-1);
   }
 };
 
+//Starter function
 Displayer.prototype.display = function(curRoot){
   var curX = parseInt(this.canvasWidth/2) - this.halfBoxWidth;
   var curY = 10;
   var context = this.myCanvas.getContext("2d");
   context.clearRect(0,0,this.canvasWidth,this.canvasHeight);
   this.drawTree(curRoot,curX,curY,4);
-  // var context = this.myCanvas.getContext("2d");
-  // context.strokeRect(0,0,100,100);
 };
-
-
 
 //-------------------Main Loader---------------------
 var loaderFunction = function(){
   var submitButton = document.getElementById("myButton");
   var inputField = document.getElementById("firstInput");
-  //debugDiv = document.getElementById("debug");
   var myCanvas = document.getElementById("myCanvas");
 
   var userData;
   var myDisplayer = new Displayer(myCanvas,40,40);
   submitButton.addEventListener("click",function(){
     userData = parseInt(inputField.value);
-  //  console.log(treeRoot);
     var curNode = new RedBlackTree( userData , "red");
     curNode.insertANode(treeRoot);
-    console.log(treeRoot);
-
 
     myDisplayer.display(treeRoot);
   });
-
-
-
-  // var p = new RedBlackTree(1);
-  // var q = new RedBlackTree(2);
-  // var a = new RedBlackTree(3);
-  // var b = new RedBlackTree(4);
-  // var c = new RedBlackTree(5);
-  //
-  // p.rightChild = q;
-  // q.par = p;
-  //
-  // p.leftChild = a;
-  // a.par = p;
-  //
-  // q.leftChild = b;
-  // b.par = q;
-  // q.rightChild = c;
-  // c.par = q;
-  //
-  // treeRoot = p;
-  // //console.log(p);
-  // q.rotateLeft();
-  // p.rotateRight();
-  // console.log(treeRoot);
-
 };
 
 window.onload = loaderFunction;
+})();

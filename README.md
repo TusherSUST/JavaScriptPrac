@@ -8,7 +8,7 @@ Practicing Javascript
 4. loaderFunction contains the main functionality of the program.It executes                                
    when all the elements of the HTML page is loaded.
 5. createKey takes an integer and an array of integers and creates a unique
-   by concatenating the elements provided.Retruns this string.
+   by concatenating the elements provided.Returns this string.
 6. isValidPosition position takes a current position ( via curX , curY ) and a
    list of previous positions as an array of integers.It calculates if the
    current position is valid for placing a queen.All previous positions consists of

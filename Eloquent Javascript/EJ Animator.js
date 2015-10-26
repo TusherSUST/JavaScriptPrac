@@ -1,8 +1,4 @@
-// test: no
-
 (function() {
-  // "use strict";
-
   var active = null;
 
   function Animated(world) {
@@ -27,7 +23,7 @@
     if (active) active.disable();
     active = this;
 
-    this.interval = setInterval(function() { self.tick(); }, 333);
+    this.interval = setInterval(function() { self.tick(); }, 1000);
   }
 
   Animated.prototype.clicked = function() {

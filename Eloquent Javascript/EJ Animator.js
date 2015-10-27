@@ -35,7 +35,7 @@
       this.button.innerHTML = "start";
     } else {
       var self = this;
-      this.interval = setInterval(function() { self.tick(); }, 333);
+      this.interval = setInterval(function() { self.tick(); }, 1000);
       this.button.innerHTML = "stop";
     }
   };

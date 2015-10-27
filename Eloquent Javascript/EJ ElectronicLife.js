@@ -77,12 +77,9 @@ var BalancedWorld = function ( map , legend ){
   this.creepAmount = 0;
 
   this.grid.forEach ( function( creep , point ){
-    // if ( creep.originalChar == "*" ) console.log( this.legend );
     if ( creep.originalChar == "*" ) this.plantAmount++;
     if ( creep.originalChar == "o" ) this.creepAmount++;
   } , this );
-  console.log( this.plantAmount );
-  console.log( this.creepAmount );
 };
 
 BalancedWorld.prototype = Object.create(LifelikeWorld.prototype);

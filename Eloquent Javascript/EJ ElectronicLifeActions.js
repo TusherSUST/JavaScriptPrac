@@ -2,13 +2,11 @@
 var actionTypes = Object.create(null);
 
 actionTypes.grow = function ( creep ) {
-  // console.log("called");
   creep.energy += 2;
   return true ;
 };
 
 actionTypes.move = function ( creep , point , action ){
-  // console.log("movin");
   var destination = this.getDestination ( action , point );
   if ( destination == null || creep.energy <= 1
       || this.grid.getValueAt( destination ) != null ){

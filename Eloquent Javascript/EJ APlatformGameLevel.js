@@ -124,7 +124,7 @@ var Level = function ( plan ) {
     for ( var x=0 ; x<this.width ; x++ ){
       var curChar = line[x] , fieldType = null;
       var Actor = actorChars[curChar];
-      // console.log(curChar);
+      // console.log(Actor);
       if ( Actor ){
         this.actors.push( new Actor( new Point( x , y ) , curChar ) );
       }
@@ -139,6 +139,8 @@ var Level = function ( plan ) {
     }
     this.grid.push ( gridLine );
   }
+
+  // console.log( this.actors );
 
   this.player = this.actors.filter ( function( actor ) {
     return actor.type == "player";

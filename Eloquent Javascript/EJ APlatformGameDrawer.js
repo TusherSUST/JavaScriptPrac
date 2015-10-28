@@ -53,7 +53,7 @@ DOMDisplay.prototype.drawFrame = function ( ) {
 DOMDisplay.prototype.scrollPlayerIntoView = function ( ) {
   var width = this.wrap.clientWidth;
   var height = this.wrap.clientHeight;
-  var margin = (width/2);
+  var margin = (width/3);
 
   var left = this.wrap.scrollLeft  , right = left + width;
   var top = this.wrap.scrollTop , bottom = top + height;
@@ -67,7 +67,8 @@ DOMDisplay.prototype.scrollPlayerIntoView = function ( ) {
   else if ( center.x > right - margin ){
     this.wrap.scrollLeft = center.x + margin - width;
   }
-  else if ( center.y < top + margin ){
+
+  if ( center.y < top + margin ){
     this.wrap.scrollTop = center.y - margin;
   }
   else if ( center.y > bottom - margin ){

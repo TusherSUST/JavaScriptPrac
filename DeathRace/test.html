@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+  <head>
+
+  </head>
+  <body>
+    <canvas id="videoCanvas" style="position: fixed; z-index: 1001;top: 10px; right: 10px; opacity: 0.9"> </canvas>
+    <div style="background-image:url('image/road.jpg');height: 700px; width: 300px;">
+		<canvas id="myCanvas" width="300" height="700" style="border:0px solid red;"></canvas>
+  </body>
+</html>
+
+
+<script type="text/javascript" src="Libs/compatibility.js"></script>
+<script type="text/javascript" src="Libs/objectdetect.js"></script>
+<script type="text/javascript" src="Libs/objectdetect.handfist.js"></script>
+<script type="text/javascript" src="Libs/objectdetect.frontalface.js"></script>
+<script type="text/javascript" src="Libs/jquery.js"></script>
+<script type="text/javascript" src="BaseOperations.js"></script>
+<script type="text/javascript" src="DeathRace.js"></script>
+
+<script>
+  window.onload = window.wisp.DeathRace();
+</script>
+
+
+<!-- <script type="text/javascript" src="HandGesture.js"></script> -->
+
+<!-- <script type="text/javascript" src="Tracker.js"></script> -->

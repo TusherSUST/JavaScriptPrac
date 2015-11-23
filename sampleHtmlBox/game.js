@@ -39,7 +39,7 @@
   var curBox = new boxBase.box ( 10 , 10 , 50 , 50 , 4 );
   var curGameGrid = new gameGrid.grid( canvas.width , canvas.height );
   var player = new playerBase.player ( 0 , 50 , -1 );
-  var speed = 5;
+  var speed = 3;
   var mousePos;
   var keyPressed = -1;
 
@@ -80,7 +80,8 @@
   };
 
   var getRandomDirection = function ( ){
-    while (true) {
+    var counter = 100;
+    while (true && counter--) {
       var randomDir = Math.floor ( Math.random() * 8 );
       var addX = speed * dirX[ randomDir ];
       var addY = speed * dirY[ randomDir ];
@@ -126,10 +127,14 @@
     moveBox();
   };
 
+  var onBorder = function ( x , y ){
+    return x == 0 || y == 0 || x == canvas.width || y == canvas.height;
+  }
+
   var collidedWithPlayer = function ( ){
     for ( var i=curBox.x ; i<=curBox.x + curBox.width ; i++ ){
       for ( var j=curBox.y ; j<=curBox.y + curBox.height ; j++ ){
-        if ( curGameGrid.getPixel( i , j ) == boxStates.PLAYER )
+        if ( curGameGrid.getPixel( i , j ) == boxStates.PLAYER && !(onBorder( i , j ) ) )
           return true;
       }
     }
@@ -327,7 +332,7 @@
   };
 
   var loader = function ( ){
-    var fps = 10;
+    var fps = 40;
 
     canvas.addEventListener('mousemove', function(evt) {
       mousePos = getMousePos( canvas, evt);
@@ -344,7 +349,7 @@
 
     collisionChecker = setInterval ( checkCollision , 1000/fps );
     moveInterval = setInterval ( moveBox , 1000/fps );
-    // mouseHandler = setInterval ( mouseEventChecker , 1000/fps );
+    mouseHandler = setInterval ( mouseEventChecker , 1000/fps );
     playerMover = setInterval ( movePlayer , 1000/fps );
     keyBoardHandler = setInterval ( keyBoardEventChecker , 1000/fps );
 

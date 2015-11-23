@@ -66,14 +66,28 @@
     curBox.draw ( context );
   };
 
+  var collidedWithBlock = function ( addX , addY ){
+    addX *= 2;
+    addY *= 2;
+    for ( var i=curBox.x + addX ; i<=curBox.x + curBox.width + addX ; i++ ){
+      for ( var j=curBox.y + addY ; j<=curBox.y + curBox.height + addY ; j++ ){
+        if ( curGameGrid.getPixel( i , j ) == boxStates.COVERED ){
+          return {x:i,y:j};
+        }
+      }
+    }
+    return false;
+  };
+
   var getRandomDirection = function ( ){
     while (true) {
       var randomDir = Math.floor ( Math.random() * 8 );
       var addX = speed * dirX[ randomDir ];
       var addY = speed * dirY[ randomDir ];
       if ( curBox.x + addX > 0 && ( curBox.x + curBox.width + addX ) < canvas.width &&
-           curBox.y + addY > 0 && ( curBox.y + curBox.height + addY ) < canvas.height )
-            return randomDir;
+           curBox.y + addY > 0 && ( curBox.y + curBox.height + addY ) < canvas.height && !collidedWithBlock( addX , addY ) ){
+             return randomDir;
+           }
     }
     return 0;
   };
@@ -123,14 +137,42 @@
     return false;
   };
 
+  var getBlockCollisionDirection = function ( collisionPoint ){
+    var midX = ( curBox.x + curBox.x + curBox.width ) / 2;
+    var midY = ( curBox.y + curBox.y + curBox.height ) / 2;
+    var halfX = ( curBox.width / 2 );
+    var halfY = ( curBox.height / 2 );
+
+    var maxVal = -100;
+    var newDirection = getRandomDirection( );
+
+    for ( var i=0 ; i<8 ; i++ ){
+      var curX = midX + ( dirX[i] * halfX );
+      var curY = midY + ( dirY[i] * halfY );
+      var curDist = getDistance ( curX , curY ,  collisionPoint.x , collisionPoint.y );
+      if ( curDist > maxVal && (curBox.direction != (i+4)%8 ) ) {
+        maxVal = curDist;
+        newDirection = i;
+      }
+    }
+
+    curBox.direction = newDirection;
+  };
+
+
   var checkCollision = function ( ){
-    // console.log ( "IN" );
     var addX = speed * dirX[ curBox.direction ];
     var addY = speed * dirY[ curBox.direction ];
     if ( collidedWithPlayer( ) ){
-      // console.log ("WTF??");
       clearIntervals();
       context.drawImage ( gameOverImage , 0 , 0 , 600 , 600 );
+      return ;
+    }
+
+    var blockCollision = collidedWithBlock( addX , addY );
+
+    if ( blockCollision ){
+      getBlockCollisionDirection( blockCollision );
       return ;
     }
 
@@ -142,8 +184,8 @@
 
   };
 
-  var getDistance = function ( curX , curY ) {
-    return ( curX - mousePos.x ) * ( curX - mousePos.x ) + ( curY - mousePos.y ) * ( curY - mousePos.y );
+  var getDistance = function ( curX , curY , nx , ny ) {
+    return ( curX - nx ) * ( curX - nx ) + ( curY - ny ) * ( curY - ny );
   };
 
   var getNewDirection = function ( ) {
@@ -158,7 +200,7 @@
     for ( var i=0 ; i<8 ; i++ ){
       var curX = midX + ( dirX[i] * halfX );
       var curY = midY + ( dirY[i] * halfY );
-      var curDist = getDistance ( curX , curY );
+      var curDist = getDistance ( curX , curY , mousePos.x , mousePos.y );
       if ( curDist > maxVal ) {
         maxVal = curDist;
         newDirection = i;
@@ -166,11 +208,6 @@
     }
 
     curBox.direction = newDirection;
-
-    curBox.eraseBox( context );
-    curBox.x += ( speed * 2 * dirX[newDirection] );
-    curBox.y += ( speed * 2 * dirY[newDirection] );
-    moveBox();
   };
 
   var isValidMove = function ( curX , curY ) {
@@ -257,9 +294,11 @@
 
         context.fillRect ( player.x , player.y , 1 , 1 );
         curGameGrid.setPixel ( nx , ny , boxStates.PLAYER );
+        gridRefreshed = false;
       }
-      else {
+      else if ( !gridRefreshed ){
         refreshGrid ( );
+        gridRefreshed = true;
         return ;
       }
     }
@@ -288,7 +327,7 @@
   };
 
   var loader = function ( ){
-    var fps = 5;
+    var fps = 10;
 
     canvas.addEventListener('mousemove', function(evt) {
       mousePos = getMousePos( canvas, evt);
